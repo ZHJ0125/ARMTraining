@@ -271,7 +271,8 @@ U_BOOT_ONENAND = $(obj)u-boot-onenand.bin
 endif
 
 __OBJS := $(subst $(obj),,$(OBJS))
-__LIBS := $(subst $(obj),,$(LIBS))
+# __LIBS := $(subst $(obj),,$(LIBS))
+__LIBS := $(subst $(obj),,$(LIBBOARD)) $(subst $(obj),,$(LIBS))
 
 #########################################################################
 #########################################################################
@@ -2402,6 +2403,9 @@ scb9328_config	:	unconfig
 
 smdk2400_config	:	unconfig
 	@$(MKCONFIG) $(@:_config=) arm arm920t smdk2400 NULL s3c24x0
+
+up2410_config	:	unconfig
+	@$(MKCONFIG) $(@:_config=) arm arm920t up2410 NULL s3c24x0
 
 smdk2410_config	:	unconfig
 	@$(MKCONFIG) $(@:_config=) arm arm920t smdk2410 NULL s3c24x0

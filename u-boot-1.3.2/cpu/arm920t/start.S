@@ -1,8 +1,8 @@
 /*
  *  armboot - Startup Code for ARM920 CPU-core
  *
- *  Copyright (c) 2001	Marius Gr�ger <mag@sysgo.de>
- *  Copyright (c) 2002	Alex Z�pke <azu@sysgo.de>
+ *  Copyright (c) 2001	Marius Gr�ger <mag@sysgo.de>
+ *  Copyright (c) 2002	Alex Z�pke <azu@sysgo.de>
  *  Copyright (c) 2002	Gary Jennejohn <gj@denx.de>
  *
  * See file CREDITS for list of people who contributed to this
@@ -178,28 +178,32 @@ copyex:
 	bl	cpu_init_crit
 #endif
 
-#ifdef	CONFIG_AT91RM9200
+@ #ifdef	CONFIG_AT91RM9200
 
 #ifndef CONFIG_SKIP_RELOCATE_UBOOT
-relocate:				/* relocate U-Boot to RAM	    */
-	adr	r0, _start		/* r0 <- current position of code   */
+#ifdef CONFIG_S3C2410_NAND_BOOT
+   	bl      copy_myself
+#else
+relocate:					/* relocate U-Boot to RAM */
+	adr	r0, _start			/* r0 <- current position of code */
 	ldr	r1, _TEXT_BASE		/* test if we run from flash or RAM */
-	cmp     r0, r1                  /* don't reloc during debug         */
+	cmp     r0, r1      	/* don't reloc during debug	*/
 	beq     stack_setup
 
 	ldr	r2, _armboot_start
 	ldr	r3, _bss_start
-	sub	r2, r3, r2		/* r2 <- size of armboot            */
-	add	r2, r0, r2		/* r2 <- source end address         */
+	sub	r2, r3, r2			/* r2 <- size of armboot */
+	add	r2, r0, r2			/* r2 <- source end address */
 
 copy_loop:
-	ldmia	r0!, {r3-r10}		/* copy from source address [r0]    */
-	stmia	r1!, {r3-r10}		/* copy to   target address [r1]    */
-	cmp	r0, r2			/* until source end addreee [r2]    */
+	ldmia	r0!, {r3-r10}	/* copy from source address [r0]    */
+	stmia	r1!, {r3-r10}	/* copy to   target address [r1]    */
+	cmp	r0, r2				/* until source end addreee [r2]    */
 	ble	copy_loop
-#endif	/* CONFIG_SKIP_RELOCATE_UBOOT */
-#endif
-	/* Set up the stack						    */
+#endif						/* endif CONFIG_S3C2410_NAND_BOOT */
+#endif						/* endif CONFIG_SKIP_RELOCATE_UBOOT */
+@ #endif					/* Set up the stack	*/
+
 stack_setup:
 	ldr	r0, _TEXT_BASE		/* upper 128 KiB: relocated uboot   */
 	sub	r0, r0, #CFG_MALLOC_LEN	/* malloc area                      */
@@ -222,6 +226,46 @@ clbss_l:str	r2, [r0]		/* clear loop...                    */
 	ldr	pc, _start_armboot
 
 _start_armboot:	.word start_armboot
+/*********************************************************************
+*
+* Function: copy u-boot to ram
+* Modifier: ZhangHoujin
+* Data: 2020.06.29
+*
+**********************************************************************/      
+#ifdef CONFIG_S3C2410_NAND_BOOT
+copy_myself :
+	mov		r10, lr					@save return address to r10
+	ldr		sp, DW_STACK_START		@安装栈的起始地址
+	mov		fp, #0					@初始化帧指针寄存器
+	bl		NF_Init					@跳到复位C函数去执行
+@read UBOOT from Nand Flash to RAM
+	ldr		r0, =UBOOT_RAM_BASE		@设置第1个参数: UBOOT在RAM中的起始地址   
+	mov		r1, #0x0				@设置第2个参数:Nand Flash的起始地址
+	mov		r2, #0x30000			@设置第3个参数: UBOOT的长度(192KB)
+ 	bl		nand_read_whole			@调用nand_read_whole(), 该函数在board/up2410/nand.c中
+   	tst		r0, #0x0				@如果函数的返回值为0,表示执行成功.
+    beq		ok_nand_read			@执行内存比较
+1:	b		1b
+ok_nand_read :
+  	mov		r0, #0x00000000			@内部RAM的起始地址      
+    ldr		r1, =UBOOT_RAM_BASE		@UBOOT在RAM中的起始地址   
+    mov		r2, #0x400				@比较1024次, 每次4字节, 4 bytes * 1024 = 4Kbytes
+go_next :
+   	ldr		r3, [r0], #4
+    ldr		r4, [r1], #4
+    teq		r3, r4
+    bne		notmatch
+    subs	r2, r2, #4
+    beq		done_nand_read
+   	bne		go_next
+notmatch :
+1:	b		1b
+done_nand_read :
+    mov		pc, r10
+#endif
+DW_STACK_START :
+    .word   STACK_BASE+STACK_SIZE-4
 
 
 /*
