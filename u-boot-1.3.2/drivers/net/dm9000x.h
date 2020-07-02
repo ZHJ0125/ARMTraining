@@ -116,4 +116,8 @@
 #define IMR_PTM			(1<<1)
 #define IMR_PRM			(1<<0)
 
+// ZhangHoujin Edited in 2020.07.12
+#define CONFIG_DM9000_BASE 0
+// End of edited
+
 #endif
