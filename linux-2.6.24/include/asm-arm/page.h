@@ -103,7 +103,8 @@
 #endif
 
 #if !defined(_USER) && !defined(MULTI_USER)
-#error Unknown user operations model
+//ZhangHoujin Edited in 2020.02.07
+//#error Unknown user operations model
 #endif
 
 struct cpu_user_fns {

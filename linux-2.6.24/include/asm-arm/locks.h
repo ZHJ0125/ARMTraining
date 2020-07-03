@@ -12,6 +12,8 @@
 #ifndef __ASM_PROC_LOCKS_H
 #define __ASM_PROC_LOCKS_H
 
+//#define __LINUX_ARM_ARCH__ 0
+
 #if __LINUX_ARM_ARCH__ >= 6
 
 #define __down_op(ptr,fail)			\

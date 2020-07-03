@@ -55,7 +55,7 @@
 #include <asm/plat-s3c24xx/common-smdk.h>
 
 /* ZhangHoujin Edited in 2020.06.29 */
-#include <asm/arch /fb.h>
+#include <asm/arch/fb.h>
 #include <linux/platform_device.h>
 static struct s3c2410fb_display up2410_fb[] __initdata = 
 {
