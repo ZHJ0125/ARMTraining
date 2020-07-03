@@ -1,0 +1,32 @@
+#ZhangHoujin Edited in 2020.07.03
+
+#! /bin/sh
+echo "Processing etc/init.d/rc.S"
+
+#hostname ${HOSTNAME}
+hostname up-tech
+/bin/mount -t proc none /proc
+/bin/mount -t sysfs none /sys
+/bin/mount -t tmpfs -o mode=0755 none /dev
+/bin/mkdir /dev/pts
+/bin/mkdir /dev/shm
+echo " Start mdev...."
+/bin/echo /sbin/mdev > proc/sys/kernel/hotplug
+mdev -s
+ 
+echo " Mount all"
+/bin/mount -a
+echo -n "Setting up interface lo: "
+
+ifconfig lo up 127.0.0.1
+echo -n "Setting up interface eth0: "
+
+ifconfig eth0 up 192.168.1.193
+echo "****************************************************"
+echo " rootfs for s3c2410"
+echo " Created by ZhangHoujin @ 2020.07.03"
+echo " Good Luck"
+echo " shandonghoujin@163.com"
+echo "****************************************************"
+echo
+
