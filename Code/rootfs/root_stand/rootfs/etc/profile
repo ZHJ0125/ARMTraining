@@ -1,0 +1,39 @@
+# /etc/profile: system-wide .profile file for the Bourne shells
+
+# echo
+# echo -n "Processing /etc/profile... "
+# no-op
+# echo "Done"
+# echo
+
+#ZhangHoujin Edited in 2020.07.03
+# /etc/profile: system-wide .profile file for the Bourne shells
+
+echo "Processing /etc/profile"
+# no-op
+
+# Set search library path
+echo " Set search library path"
+export LD_LIBRARY_PATH=/lib:/usr/lib
+
+# Set user path
+echo " Set user path"
+PATH=/bin:/sbin:/usr/bin:/usr/sbin
+export PATH
+
+# Set PS1
+echo " Set PS1"
+HOSTNAME=`/bin/hostname`
+# 此处让shell提示符显示host名称的。是`，不是’，要注意
+# 会在进入根系统后显示Jacky
+
+export PS1="\\e[32m[$USER@$HOSTNAME \\w\\a]\\$\\e[00;37m "
+# 此处\\e[32m是让后面的“[$USER@$HOSTNAME \\w\\a]”显示为绿色
+# \\e[00是关闭效果
+# \\e[05是闪烁
+# 37m是让后面的显示为白色
+# 多个命令可以；号隔开
+
+echo "All done!"
+echo
+
